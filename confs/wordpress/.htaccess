@@ -3,18 +3,18 @@
 
 # BEGIN Disable XML-RPC #D.K.
 <Files xmlrpc.php>
-Order Allow,Deny
-Deny from all
+    Order Allow,Deny
+    Deny from all
 </Files>
 # END Disable XML-RPC
 # BEGIN wp-config Datenschutz
 <Files wp-config.php>
-Order Allow,Deny
-Deny from all
+    Order Allow,Deny
+    Deny from all
 </Files>
 <Files debug.log>
-Order Allow,Deny
-Deny from all
+    Order Allow,Deny
+    Deny from all
 </Files>
 # END wp-config Datenschutz
 
