@@ -1,0 +1,5 @@
+# Ignore everything in confs/
+confs/
+content/
+node_modules/
+vendor/
