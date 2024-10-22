@@ -1,0 +1,129 @@
+name: fms #fakulty management system
+services:
+  db:
+    image: juliush-dev/db-server
+    build:
+      context: .
+      dockerfile: db-server.Dockerfile
+      target: dev
+    secrets:
+      - db
+      - db_custom_owner
+      - db_custom_owner_password
+      - db_root_owner_password
+    environment:
+      - MYSQL_DATABASE_FILE=/run/secrets/db
+      - MYSQL_USER_FILE=/run/secrets/db_custom_owner
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_custom_owner_password
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_owner_password
+    volumes:
+      - db-default:/var/lib/mysql
+      # - db-confs:/etc
+    restart: always
+  db-ui-server:
+    depends_on:
+      - db
+    image: juliush-dev/db-ui-server
+    build:
+      context: .
+      dockerfile: db-ui-server.Dockerfile
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    restart: always
+  content-manager-framework:
+    depends_on:
+      - db
+    image: juliush-dev/content-manager-framework
+    build:
+      context: .
+      dockerfile: content-manager-framework.Dockerfile
+      target: dev
+    volumes:
+      - content-manager-framework:/framework/wordpress
+  content-manager-processor:
+    depends_on:
+      - content-manager-framework
+    image: juliush-dev/content-manager-processor
+    build:
+      context: .
+      dockerfile: content-manager-processor.Dockerfile
+    secrets:
+      - db_server
+      - db
+      - db_custom_owner
+      - db_custom_owner_password
+      - db_root_owner_password
+    environment:
+      - DB_SERVER_FILE=/run/secrets/db-server
+      - DB_FILE=/run/secrets/db
+      - DB_CUSTOM_OWNER_FILE=/run/secrets/db_custom_owner
+      - DB_CUSTOM_OWNER_PWD_FILE=/run/secrets/db_custom_owner_password
+    volumes:
+      - content-manager-framework:/var/www/html
+  content-server:
+    depends_on:
+      - content-manager-processor
+    image: juliush-dev/content-server
+    build:
+      context: .
+      dockerfile: content-server.Dockerfile
+      target: dev
+    volumes:
+      - content-manager-framework:/usr/local/apache2/htdocs
+      - content-server-wkd:/usr/local/apache2
+    ports:
+      - "80:80"
+  devcontainer:
+    # at last
+    depends_on:
+      - content-server
+    image: juliush-dev/dev-container
+    build:
+      context: .
+      dockerfile: dev-container.Dockerfile
+    command: sleep infinity
+    volumes:
+      # dev-will be exposed to all volumes where the product of our idea is created by us
+      # or by other services
+      - type: volume
+        source: content-manager-framework
+        target: /workspaces/content
+        volume:
+          subpath: wp-content
+      - type: volume
+        source: content-manager-framework
+        target: /workspaces/my-custom-plugin
+        volume:
+          subpath: wp-content/plugins/my-custom-plugin
+      - type: volume
+        source: content-manager-framework
+        target: /workspaces/my-custom-theme
+        volume:
+          subpath: wp-content/themes/my-custom-theme
+      - content-server-wkd:/workspaces/confs/server:cached
+      # - db-confs:/workspaces/confs/db:cached
+      - content-manager-framework:/workspaces/confs/wordpress:cached
+
+volumes:
+  db-default:
+  db-confs:
+  db-prod:
+  content-manager-framework:
+  content:
+  content-server-wkd:
+  custom-plugin-src:
+  custom-theme-src:
+secrets:
+  db_server:
+    file: ../secrets/db_server.txt
+  db:
+    file: ../secrets/db.txt
+  db_custom_owner:
+    file: ../secrets/db_custom_owner.txt
+  db_custom_owner_password:
+    file: ../secrets/db_custom_owner_password.txt
+  db_root_owner_password:
+    file: ../secrets/db_root_owner_password.txt
