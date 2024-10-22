@@ -50,6 +50,7 @@ services:
     build:
       context: .
       dockerfile: content-manager-processor.Dockerfile
+      target: dev
     secrets:
       - db_server
       - db
@@ -63,6 +64,7 @@ services:
       - DB_CUSTOM_OWNER_PWD_FILE=/run/secrets/db_custom_owner_password
     volumes:
       - content-manager-framework:/var/www/html
+      - content-manager-processor:/usr/local/etc/php
   content-server:
     depends_on:
       - content-manager-processor
@@ -104,6 +106,7 @@ services:
         volume:
           subpath: wp-content/themes/my-custom-theme
       - content-server-wkd:/workspaces/confs/server:cached
+      - content-manager-processor:/workspaces/confs/fpm:cached
       # - db-confs:/workspaces/confs/db:cached
       - content-manager-framework:/workspaces/confs/wordpress:cached
 
@@ -112,6 +115,7 @@ volumes:
   db-confs:
   db-prod:
   content-manager-framework:
+  content-manager-processor:
   content:
   content-server-wkd:
   custom-plugin-src:
