@@ -1,0 +1,35 @@
+# BEGIN Custom
+# END Custom
+
+# BEGIN Disable XML-RPC #D.K.
+<Files xmlrpc.php>
+Order Allow,Deny
+Deny from all
+</Files>
+# END Disable XML-RPC
+# BEGIN wp-config Datenschutz
+<Files wp-config.php>
+Order Allow,Deny
+Deny from all
+</Files>
+<Files debug.log>
+Order Allow,Deny
+Deny from all
+</Files>
+# END wp-config Datenschutz
+
+# BEGIN WordPress
+# Die Anweisungen (Zeilen) zwischen „BEGIN WordPress“ und „END WordPress“ sind
+# dynamisch generiert und sollten nur über WordPress-Filter geändert werden.
+# Alle Änderungen an den Anweisungen zwischen diesen Markierungen werden überschrieben.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteBase /
+    RewriteRule ^index\.php$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
