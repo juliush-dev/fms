@@ -20,9 +20,8 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "sudo chmod a+x \"$(pwd)\" && sudo rm -rf /var/www/html && sudo ln -s \"$(pwd)\" /var/www/html"
 	"postCreateCommand": {
-		"syncWithSrcRemoteRepo":"mv confs/wordpress/wp-config.php /tmp/ && [ ! -d .git ] && git init && git branch -m src && git remote add origin https://github.com/juliush-dev/fms.git && git fetch origin src && git checkout -f src && mv /tmp/wp-config.php ./confs/wordpress/", 
+		"syncWithSrcRemoteRepo":"[ ! -d .git ] && git init && git branch -m src && git remote add origin https://github.com/juliush-dev/fms.git && git fetch origin src && git checkout -f src", 
 	},
-
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	"remoteUser": "root"
 }
