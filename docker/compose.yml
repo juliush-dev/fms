@@ -34,8 +34,6 @@ services:
       - PMA_PORT=3306
     restart: always
   content-manager-framework:
-    depends_on:
-      - db
     image: juliush-dev/content-manager-framework
     build:
       context: .
@@ -45,6 +43,7 @@ services:
       - content-manager-framework:/framework/wordpress
   content-manager-processor:
     depends_on:
+      - db
       - content-manager-framework
     image: juliush-dev/content-manager-processor
     build:
@@ -63,8 +62,8 @@ services:
       - DB_CUSTOM_OWNER_FILE=/run/secrets/db_custom_owner
       - DB_CUSTOM_OWNER_PWD_FILE=/run/secrets/db_custom_owner_password
     volumes:
-      - content-manager-framework:/var/www/html
       - content-manager-processor:/usr/local/etc/php
+      - content-manager-framework:/var/www/html
   content-server:
     depends_on:
       - content-manager-processor
@@ -81,7 +80,7 @@ services:
   devcontainer:
     # at last
     depends_on:
-      - content-server
+      - content-manager-processor
     image: juliush-dev/dev-container
     build:
       context: .
